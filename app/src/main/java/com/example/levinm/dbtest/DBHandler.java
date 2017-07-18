@@ -1,5 +1,6 @@
 package com.example.levinm.dbtest;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -32,13 +33,14 @@ public class DBHandler extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null , DATABASE_VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         String CREATE_TABLE_PRODUCTS = "CREATE TABLE " + TABLE + "("
                 + KEY_ID + "INTEGER PRIMARY KEY AUTOINCREMENT ,"
                 + KEY_Product + "TEXT, "
-                + Key_ProductBarcode + "INTEGER)";
+                + Key_ProductBarcode + "TEXT)";
     }
 
     @Override
@@ -52,6 +54,23 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     }
+
+    public void insert(Product product){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID , product.getId());
+        values.put(KEY_Product, product.getName());
+        values.put(Key_ProductBarcode, product.getBarCode());
+
+        db.insert(this.TABLE, null, values);
+
+    }
+
+
+
+
 }
 
 
