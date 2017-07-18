@@ -6,7 +6,6 @@ import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DBHandler dbhandler;
 
 
     @Override
@@ -18,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         DBHandler db = new DBHandler(this);
         Log.d("insert: ","Inserting.. " );
 
-        db.insert(new Product(1,"Davanti","4060800173010"));
+        db.insert(new Product(1, "Davanti","4060800173010"));
 
 
 
