@@ -16,18 +16,25 @@ public class MainActivity extends AppCompatActivity {
 
         DBHandler db = new DBHandler(this);
         Log.d("insert: ","Inserting.. " );
+        db.insert(this);
 
-        db.insert(new Product(1, "Davanti","4060800173010"));
+        Log.d("READING: ", "Reading all Products");
+
+
 
 
 
     }
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+

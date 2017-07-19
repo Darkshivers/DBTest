@@ -2,15 +2,23 @@ package com.example.levinm.dbtest;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by levinm on 18/07/2017.
  */
 
 public class DBHandler extends SQLiteOpenHelper {
+
+    Context DBHandler;
 
     SQLiteDatabase db;
 
@@ -33,14 +41,15 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-
         Log.d("creating: ","Inserting.. " );
 
+
         String CREATE_TABLE_PRODUCTS = "CREATE TABLE " + TABLE + " (" +
-                KEY_ID + " INTEGER PRIMARY KEY," +
+                KEY_ID + " TEXT PRIMARY KEY," +
                 KEY_Product + " TEXT," +
                 Key_ProductBarcode + " TEXT)";
 
@@ -58,30 +67,50 @@ public class DBHandler extends SQLiteOpenHelper {
 
         //Recreate
         onCreate(db);
-
-
     }
 
-    public void insert(Product product){
+    public void insert(Context context){
 
-
-
+        
         SQLiteDatabase db = getWritableDatabase();
 
-        ContentValues values = new ContentValues();
+        String mCSVfile = "csvfile.csv";
+        AssetManager manager = context.getAssets();
+        InputStream inStream = null;
+        try {
+            inStream = manager.open(mCSVfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        values.put(Key_ProductBarcode, product.getBarCode());
-        values.put(KEY_ID , product.getId());
-        values.put(KEY_Product, product.getName());
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(inStream));
+        String line = "";
+        db.beginTransaction();
 
-        db.insert(this.TABLE, null, values);
+        try {
+            while ((line = buffer.readLine()) != null) {
+                String[] columns = line.split(",");
+                if (columns.length != 4) {
+                    Log.d("CSVParser", "Skipping Bad CSV Row");
+                    continue;
+                }
+
+                ContentValues values = new ContentValues();
+                values.put(KEY_ID, columns[0].trim());
+                values.put(Key_ProductBarcode, columns[1].trim());
+                values.put(KEY_Product, columns[2]);
+                db.insert(this.TABLE, null, values);
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
         db.close();
 
     }
-
-
-
-
 }
 
 
