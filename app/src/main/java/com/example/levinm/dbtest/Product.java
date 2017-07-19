@@ -6,21 +6,21 @@ package com.example.levinm.dbtest;
 
 public class Product {
 
-    private int id;
+    private String id;
     private String name;
     private String barcode;
 
     public Product(){}
 
 
-    public Product(int id, String name, String barcode){
+    public Product(String id, String name, String barcode){
 
         this.id = id;
         this.name = name;
         this.barcode = barcode;
     }
 
-public void setId(int id) {
+public void setId(String id) {
     this.id = id;
 
 }
@@ -29,7 +29,9 @@ public void setName(String name) {
     this.name = name;
 }
 
-public int getId() {
+public void setBarcode(String barcode) {this.barcode = barcode;}
+
+public String getId() {
     return id;
 }
 

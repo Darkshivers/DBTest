@@ -3,6 +3,7 @@ package com.example.levinm.dbtest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -11,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by levinm on 18/07/2017.
@@ -18,9 +21,6 @@ import java.io.InputStreamReader;
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    Context DBHandler;
-
-    SQLiteDatabase db;
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "FeedReader.db";
@@ -90,7 +90,7 @@ public class DBHandler extends SQLiteOpenHelper {
         try {
             while ((line = buffer.readLine()) != null) {
                 String[] columns = line.split(",");
-                if (columns.length != 4) {
+                if (columns.length < 1) {
                     Log.d("CSVParser", "Skipping Bad CSV Row");
                     continue;
                 }
@@ -98,7 +98,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 ContentValues values = new ContentValues();
                 values.put(KEY_ID, columns[0].trim());
                 values.put(Key_ProductBarcode, columns[1].trim());
-                values.put(KEY_Product, columns[2]);
+                values.put(KEY_Product, columns[2].trim());
                 db.insert(this.TABLE, null, values);
 
             }
@@ -111,6 +111,45 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
 
     }
+
+    public List<Product> getAllProducts(){
+
+
+        List<Product> productlist = new ArrayList<Product>();
+        String Select = "SELECT * FROM " + TABLE;
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery(Select, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Product product = new Product();
+                product.setId((cursor.getString(0)));
+                product.setName(cursor.getString(1));
+                product.setBarcode(cursor.getString(2));
+
+                productlist.add(product);
+
+            } while (cursor.moveToNext());
+
+        }
+            return productlist;
+    }
+
+
+    public Product getProduct(String barcode) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE, new String[]{KEY_ID, Key_ProductBarcode,
+                KEY_Product}, Key_ProductBarcode + "=?", new String[]{barcode}, null, null, null, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        Product contact = new Product(cursor.getString(0), cursor.getString(2), cursor.getString(1));
+
+        return contact;
+    }
+
+
 }
 
 
